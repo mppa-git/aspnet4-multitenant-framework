@@ -1,5 +1,8 @@
 ﻿using Autofac;
+using Autofac.Extras.Multitenant;
+using Autofac.Extras.Multitenant.Web;
 using Autofac.Integration.Mvc;
+using Bah.Core.Site.Multitenancy;
 using Shell.Models;
 using System;
 using System.Collections.Generic;
@@ -16,6 +19,8 @@ namespace Shell
     {
         protected void RegisterServices()
         {
+            var tenantIdStrategy = new RouteDataItemTenantIdentificationStrategy("tenant");
+
             var builder = new ContainerBuilder();
 
             // Register your MVC controllers.
@@ -34,14 +39,29 @@ namespace Shell
             // OPTIONAL: Enable property injection into action filters.
             builder.RegisterFilterProvider();
 
-            // Set up db contexts
-            builder.RegisterType<TestDbContext>()
-                .As<TestDbContext>()
-                .InstancePerRequest();
+            // Create the multitenant container and the tenant overrides.
+            var mtc = new MultitenantContainer(tenantIdStrategy, builder.Build());
+            AddTenant(mtc, "a");
+            AddTenant(mtc, "b");
 
-            // Set the dependency resolver to be Autofac.
-            var container = builder.Build();
-            DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+            DependencyResolver.SetResolver(new AutofacDependencyResolver(mtc));
+        }
+
+        private void AddTenant(MultitenantContainer mtc, string tenantId)
+        {
+            mtc.ConfigureTenant(tenantId,
+                b =>
+                {
+                    b.Register(c =>
+                    {
+                        var connectionString = "Server=.;Database=aspnet5_" + tenantId + ";Trusted_Connection=True;MultipleActiveResultSets=true";
+                        return new TestDbContext(connectionString);
+                    })
+                      .As<TestDbContext>()
+                      .InstancePerDependency();
+                    //b.RegisterType<Tenant1Dependency>().As<IDependency>().InstancePerDependency();
+                    //b.RegisterType<Tenant1Controller>().As<HomeController>();
+                });
         }
 
         protected void Application_Start()

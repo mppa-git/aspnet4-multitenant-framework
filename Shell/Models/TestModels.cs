@@ -14,6 +14,10 @@ namespace Shell.Models
 
     public class TestDbContext : DbContext
     {
+        public TestDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+        }
+
         public virtual DbSet<Test> Tests { get; set; }
     }
 }
