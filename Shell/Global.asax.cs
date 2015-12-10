@@ -83,10 +83,7 @@ namespace Shell
                         .As<TestDbContext>()
                         .InstancePerDependency();
 
-                    var iOption = new OptionsManager<MyOptions>(options);
-                    b.RegisterInstance(iOption)
-                        .As<IOptions<MyOptions>>()
-                        .SingleInstance();
+                    b.ConfigureOptions(options);
                 });
         }
 

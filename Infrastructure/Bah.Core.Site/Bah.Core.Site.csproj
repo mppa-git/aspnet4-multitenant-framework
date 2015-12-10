@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
+    <Compile Include="Configuration\ConfigurationExtensions.cs" />
     <Compile Include="Configuration\IOptions.cs" />
     <Compile Include="Configuration\OptionsManager.cs" />
     <Compile Include="Multitenancy\RouteDataItemTenantIdentificationStrategy.cs" />
