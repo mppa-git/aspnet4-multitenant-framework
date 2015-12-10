@@ -1,4 +1,6 @@
-﻿using Shell.Models;
+﻿using Bah.Core.Site.Configuration;
+using Shell.Models;
+using Shell.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +13,13 @@ namespace Shell.Controllers
     {
         public TestDbContext TestDbContext { get; private set; }
         //public ITenantService TenantService { get; private set; }
-        //private MyOptions Options { get; set; }
+        private MyOptions Options { get; set; }
 
-        public HomeController(TestDbContext db) //, ITenantService tenantService, IOptions<MyOptions> options)
+        public HomeController(TestDbContext db, IOptions<MyOptions> options) //, ITenantService tenantService)
         {
             this.TestDbContext = db;
             //this.TenantService = tenantService;
-            //this.Options = options.Value;
+            this.Options = options.Value;
         }
 
         public ActionResult Index()
@@ -36,9 +38,10 @@ namespace Shell.Controllers
 
             var tenantName = "unknown";
             ViewData["Message"] = string.Format(
-                "Your {0} application description page.  {1} tests run.",
+                "Your {0} application description page.  {1} tests run.  Setting1 is {2}",
                 tenantName,
-                this.TestDbContext.Tests.Count());
+                this.TestDbContext.Tests.Count(),
+                this.Options.Setting1);
 
             return View();
         }

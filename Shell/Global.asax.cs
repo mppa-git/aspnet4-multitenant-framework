@@ -2,10 +2,13 @@
 using Autofac.Extras.Multitenant;
 using Autofac.Extras.Multitenant.Web;
 using Autofac.Integration.Mvc;
+using Bah.Core.Site.Configuration;
 using Bah.Core.Site.Multitenancy;
 using Shell.Models;
+using Shell.Options;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -47,20 +50,43 @@ namespace Shell
             DependencyResolver.SetResolver(new AutofacDependencyResolver(mtc));
         }
 
+        public MyOptions GetMyOptions(string tenant)
+        {
+            var connectionString = "Server=.;Database=aspnet5_" + tenant + ";Trusted_Connection=True;MultipleActiveResultSets=true";
+
+            var o = new MyOptions();
+            o.ConnectionString = connectionString;
+
+            switch (tenant)
+            {
+                case "a":
+                    o.Setting1 = "setting overridden for a";
+                    break;
+                case "b":
+                    o.Setting1 = "overridden for b";
+                    break;
+                default:
+                    break;
+            }
+
+            return o;
+        }
+
         private void AddTenant(MultitenantContainer mtc, string tenantId)
         {
             mtc.ConfigureTenant(tenantId,
                 b =>
                 {
-                    b.Register(c =>
-                    {
-                        var connectionString = "Server=.;Database=aspnet5_" + tenantId + ";Trusted_Connection=True;MultipleActiveResultSets=true";
-                        return new TestDbContext(connectionString);
-                    })
-                      .As<TestDbContext>()
-                      .InstancePerDependency();
-                    //b.RegisterType<Tenant1Dependency>().As<IDependency>().InstancePerDependency();
-                    //b.RegisterType<Tenant1Controller>().As<HomeController>();
+                    var options = this.GetMyOptions(tenantId);
+
+                    b.Register(c => new TestDbContext(options.ConnectionString))
+                        .As<TestDbContext>()
+                        .InstancePerDependency();
+
+                    var iOption = new OptionsManager<MyOptions>(options);
+                    b.RegisterInstance(iOption)
+                        .As<IOptions<MyOptions>>()
+                        .SingleInstance();
                 });
         }
 
