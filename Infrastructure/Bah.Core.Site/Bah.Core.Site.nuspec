@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <!-- <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl> -->
+    <projectUrl>https://github.com/mppa-git/aspnet4-multitenant-framework</projectUrl>
+    <iconUrl>https://raw.github.com/mppa-git/aspnet4-multitenant-framework/master/nuget/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>.net4 multitenancy</tags>
+  </metadata>
+</package>
